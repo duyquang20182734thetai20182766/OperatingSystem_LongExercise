@@ -1,7 +1,7 @@
 #include "pintos_thread.h"
 
 struct station {
-	// Khai báo các biến chỗ ngồi - seats, thời gian chờ tàu - waiting, khánh đang lên tàu - boarding
+	// Khai báo các biến chỗ ngồi - seats, người chờ tàu - waiting, khánh đang lên tàu - boarding
 	int seats, waiting, boarding;
 
 	// Khai báo khóa bảo vệ biến global
@@ -44,7 +44,7 @@ void station_load_train(struct station *station, int count)
 	// Gửi tín hiệu khách sẵn sàng lên tàu
 	cond_broadcast(&station->seat_avalable, &station->lock); 
 
-	//Chỗ ngồi và thời gian > 0 thì thread ngủ
+	//Chỗ ngồi và người chờ > 0 thì thread ngủ
 	while (station->seats >0 && station->waiting >0)
 	{
 		cond_wait(&station->train_leave, &station->lock);
@@ -60,7 +60,7 @@ void station_wait_for_train(struct station *station)
 {
 	lock_acquire(&station->lock);
 
-	//Xét thời gian chờ tàu tăng lên 1	
+	//Xét hành khách chờ tàu tăng lên 1	
 	station->waiting ++;
 
 	// Khi mà chỗ ngồi bằng 0 xét tín tiệu cho tàu đến
@@ -70,7 +70,7 @@ void station_wait_for_train(struct station *station)
 	}
 
 	//Khi tàu sẵn sàng, mọi người lên tàu boarding++ -> chỗ ngồi giảm xuống seats--
-	//Thoi gian cho tau = 0 -> waiting --
+	//Hành khách chờ tàu giảm -> waiting --
 	station->boarding ++;
 	station->seats --;
 	station->waiting --;
